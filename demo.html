@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Ecommerce Plugin Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            padding: 2rem;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .demo-frame {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin: 2rem 0;
+            background: white;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 600px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e3e3e3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fecaca;
+        }
+        
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #bbf7d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛍️ 3D Virtual Store Demo</h1>
+        
+        <div class="status" id="status">
+            <div class="spinner"></div>
+            Checking if your 3D store is running...
+        </div>
+        
+        <div class="demo-frame" id="demo-frame">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading 3D Store Experience...
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🎮</div>
+                <h3>Interactive 3D</h3>
+                <p>Navigate through a virtual store with realistic 3D product displays</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛒</div>
+                <h3>Real-time Cart</h3>
+                <p>Add products to cart with instant updates across all devices</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <h3>AI Recommendations</h3>
+                <p>Personalized product suggestions based on user behavior</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <h3>Mobile Ready</h3>
+                <p>Fully responsive design with touch gesture support</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <a href="http://localhost:3000" target="_blank" class="btn" id="store-link">
+                🚀 Open 3D Store
+            </a>
+            <a href="http://localhost:3001/health" target="_blank" class="btn" id="api-link">
+                📊 Check API Status
+            </a>
+        </div>
+        
+        <div style="margin-top: 2rem; opacity: 0.8;">
+            <p>💡 <strong>Tip:</strong> If the store isn't loading, make sure you've run <code>npm run dev</code></p>
+            <p>📖 Check <strong>SETUP_INSTRUCTIONS.md</strong> for complete setup guide</p>
+        </div>
+    </div>
+
+    <script>
+        // Check if servers are running
+        async function checkStatus() {
+            const status = document.getElementById('status');
+            const frame = document.getElementById('demo-frame');
+            
+            try {
+                // Check if frontend is running
+                const frontendResponse = await fetch('http://localhost:3000', { 
+                    mode: 'no-cors',
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                // Check if backend is running
+                const backendResponse = await fetch('http://localhost:3001/health', {
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                // If we get here, servers are running
+                status.className = 'status success';
+                status.innerHTML = '✅ 3D Store is running! Frontend and backend servers are active.';
+                
+                // Load the actual store in iframe
+                frame.innerHTML = '<iframe src="http://localhost:3000" style="width: 100%; height: 100%; border: none; border-radius: 20px;"></iframe>';
+                
+            } catch (error) {
+                // Servers not running
+                status.className = 'status error';
+                status.innerHTML = `
+                    ❌ 3D Store is not running. Please start the development servers:<br>
+                    <strong>Run:</strong> <code>npm run dev</code><br>
+                    <strong>Then refresh this page</strong>
+                `;
+                
+                frame.innerHTML = `
+                    <div class="loading" style="color: #ef4444;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                            <h3>Development servers not running</h3>
+                            <p style="margin: 1rem 0;">Please run <code>npm run dev</code> to start the 3D store</p>
+                            <button onclick="window.location.reload()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                🔄 Refresh Page
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Check status on page load
+        checkStatus();
+        
+        // Recheck every 10 seconds
+        setInterval(checkStatus, 10000);
+        
+        // Add click handlers for links
+        document.getElementById('store-link').addEventListener('click', function(e) {
+            // Try to open in new tab, but show instructions if servers aren't running
+            setTimeout(() => {
+                const newWindow = window.open('http://localhost:3000', '_blank');
+                if (!newWindow) {
+                    alert('Please make sure your 3D store is running by executing: npm run dev');
+                }
+            }, 100);
+        });
+        
+        document.getElementById('api-link').addEventListener('click', function(e) {
+            setTimeout(() => {
+                const newWindow = window.open('http://localhost:3001/health', '_blank');
+                if (!newWindow) {
+                    alert('Please make sure your backend server is running by executing: npm run dev');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
