@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import type { ApiResponse, Store3DConfig } from '@shared/types'
 
 const router = Router()
@@ -36,7 +36,7 @@ const mockStore3DConfig: Store3DConfig = {
 }
 
 // GET /api/store3d/config - Get store 3D configuration
-router.get('/config', async (req, res) => {
+router.get('/config', async (req: Request, res: Response) => {
   try {
     const response: ApiResponse<Store3DConfig> = {
       success: true,
@@ -54,7 +54,7 @@ router.get('/config', async (req, res) => {
 })
 
 // PUT /api/store3d/config - Update store 3D configuration
-router.put('/config', async (req, res) => {
+router.put('/config', async (req: Request, res: Response) => {
   try {
     const config = req.body
 
